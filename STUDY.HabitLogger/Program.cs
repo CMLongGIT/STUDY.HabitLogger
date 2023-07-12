@@ -6,9 +6,11 @@ namespace habit_logger
 {
     class Program
     {
+        static string connectionString = @"Data Source=habit-Logger.db";
+
         static void Main(string[] args)
         {
-            string connectionString = @"Data Source=habit-Logger.db";
+            
 
             using (var connection = new SqliteConnection(connectionString))
             {
@@ -26,6 +28,8 @@ namespace habit_logger
 
                 connection.Close();
             }
+
+            GetUserInput();
         }
 
         static void GetUserInput()
@@ -51,9 +55,9 @@ namespace habit_logger
                         Console.WriteLine("\nGoodbye!\n");
                         closeApp = true;
                         break;
-                   // case "1":
-                   //     GetAllRecords();
-                   //     break;
+                    case "1":
+                        GetAllRecords();
+                        break;
                     case "2":
                         Insert();
                         break;
@@ -65,6 +69,55 @@ namespace habit_logger
                   //      break;
                 }
             }
+        }
+
+        private static void GetAllRecords()
+        {
+
+        }
+
+        private static void Insert()
+        {
+            string date = GetDateInput();
+
+            int quantity = GetNumberInput("\n\nPlease insert number of glasses or other measure of your choice (no decimans allowed.)\n\n");
+
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                var tableCmd = connection.CreateCommand();
+
+                tableCmd.CommandText =
+                    $"INSERT INTO drinking_water(date, quantity) VALUES('{date}', {quantity})";
+
+                tableCmd.ExecuteNonQuery();
+
+                connection.Close();
+            }
+        }
+
+        internal static string GetDateInput()
+        {
+            Console.WriteLine("\n\nPlease insert the date: (Format: dd-mm-yy). Type 0 to return to main menu.");
+
+            string dateInput = Console.ReadLine();
+
+            if (dateInput == "0") GetUserInput();
+
+            return dateInput;
+        }
+
+        internal static int GetNumberInput(string message)
+        {
+            Console.WriteLine(message);
+
+            string numberInput = Console.ReadLine();
+
+            if (numberInput == "0") GetUserInput();
+
+            int finalInput = Convert.ToInt32(numberInput);
+
+            return finalInput;
         }
     }
 }
